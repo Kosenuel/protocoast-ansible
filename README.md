@@ -96,9 +96,3 @@ Notes and troubleshooting
 kubectl --kubeconfig C:\path\to\kubeconfig get nodes
 kubectl --kubeconfig C:\path\to\kubeconfig get pods -A
 ```
-
-Where to go next
-----------------
-- If you want, I can: review your `inventory/mycluster/hosts.yaml` and `group_vars` and
-  give exact edits; run the connectivity ping from your controller and report results; or
-  run the playbooks and help troubleshoot any failures. Tell me which you'd like.
