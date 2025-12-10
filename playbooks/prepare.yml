@@ -1,0 +1,45 @@
+---
+- name: Prepare hosts for Kubespray
+  hosts: all
+  become: true
+  vars_files: []
+  tasks:
+    - name: Ensure Python3 is installed (Debian/Ubuntu)
+      ansible.builtin.apt:
+        name: python3
+        state: present
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Ensure python3-apt installed (Debian/Ubuntu)
+      ansible.builtin.apt:
+        name: python3-apt
+        state: present
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Ensure Python is available as /usr/bin/python -> python3
+      ansible.builtin.file:
+        path: /usr/bin/python
+        state: link
+        src: /usr/bin/python3
+      when: ansible_facts['python']['executable'] is not defined or ('python3' in (ansible_facts['python']['executable'] | string))
+
+    - name: Disable swap
+      ansible.builtin.shell: |
+        swapoff -a
+        sed -i.bak '/\bswap\b/s/^/#/' /etc/fstab || true
+      args:
+        warn: false
+
+    - name: Ensure hostname is set to inventory hostname
+      ansible.builtin.hostname:
+        name: "{{ inventory_hostname }}"
+
+    - name: Ensure required packages (curl, ca-certificates)
+      ansible.builtin.package:
+        name:
+          - curl
+          - ca-certificates
+        state: present
+
+    - name: Reset connection to pick up Python changes
+      ansible.builtin.meta: reset_connection

@@ -1,0 +1,3 @@
+---
+# etcd group vars
+etcd_deployment_type: "host"

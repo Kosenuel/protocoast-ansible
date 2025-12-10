@@ -1,0 +1,4 @@
+---
+# Control plane specific variables (defaults)
+apiserver_loadbalancer_domain_name: ""
+kube_control_plane_nodes: true

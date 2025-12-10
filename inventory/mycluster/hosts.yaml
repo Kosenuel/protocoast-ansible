@@ -1,0 +1,61 @@
+all:
+  hosts:
+    # Bastion node / host running this playbook (if applicable)
+    bastion:
+      ansible_host: 
+      ip: 
+      access_ip: 
+
+    # Control plane hosts (defaults inferred from modules' defaults).
+    k8s-cp-1:
+      ansible_host: 10.0.1.10    # <-- REPLACE with actual private IP
+      ip: 10.0.1.10              # kubeadm/ip used by Kubespray
+      access_ip: 203.0.113.10    # <-- REPLACE with public/floating IP if available, else omit
+    k8s-cp-2:
+      ansible_host: 10.0.1.11
+      ip: 10.0.1.11
+      access_ip: 203.0.113.11
+    k8s-cp-3:
+      ansible_host: 10.0.1.12
+      ip: 10.0.1.12
+      access_ip: 203.0.113.12
+
+    # Worker hosts
+    k8s-worker-1:
+      ansible_host: 10.0.1.20
+      ip: 10.0.1.20
+      access_ip: 203.0.113.20
+    k8s-worker-2:
+      ansible_host: 10.0.1.21
+      ip: 10.0.1.21
+      access_ip: 203.0.113.21
+    k8s-worker-3:
+      ansible_host: 10.0.1.22
+      ip: 10.0.1.22
+      access_ip: 203.0.113.22
+
+  children:
+    kube_control_plane:
+      hosts:
+        k8s-cp-1: {}
+        k8s-cp-2: {}
+        k8s-cp-3: {}
+
+    kube_node:
+      hosts:
+        k8s-worker-1: {}
+        k8s-worker-2: {}
+        k8s-worker-3: {}
+
+    etcd:
+      hosts:
+        k8s-cp-1: {}
+        k8s-cp-2: {}
+        k8s-cp-3: {}
+
+    k8s_cluster:
+      children:
+        kube_control_plane: {}
+        kube_node: {}
+
+    # Add other Kubespray groups here if required (e.g., kube_network_plugin)

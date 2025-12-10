@@ -1,0 +1,4 @@
+---
+# Worker node specific variables
+node_labels: {}
+node_taints: []
