@@ -27,7 +27,7 @@
       ansible.builtin.shell: |
         swapoff -a
         sed -i.bak '/\bswap\b/s/^/#/' /etc/fstab || true
-      warn: false
+      # warn disabled intentionally removed for compatibility with older Ansible
 
     - name: Ensure hostname is set to inventory hostname
       ansible.builtin.hostname:
