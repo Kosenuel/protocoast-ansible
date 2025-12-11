@@ -6,7 +6,7 @@
 
   vars:
     kubespray_repo: https://github.com/kubernetes-sigs/kubespray.git
-    kubespray_dir: ./kubespray
+    kubespray_dir: "/home/ubuntu/ansible-repo/kubespray" # Adjust as needed
     inventory_file: ../inventory/mycluster/hosts.yaml
 
   tasks:
@@ -73,9 +73,9 @@
 
     - name: Install Kubespray Galaxy roles
       ansible.builtin.command:
-        cmd: "{{ kubespray_dir }}/.venv/bin/ansible-galaxy install -r {{ kubespray_dir }}/requirements.txt"
-      # args:
-      #   chdir: "{{ kubespray_dir }}"
+        cmd: "{{ kubespray_dir }}/.venv/bin/ansible-galaxy install -r {{ kubespray_dir }}/requirements.yml"
+      args:
+        chdir: "{{ kubespray_dir }}"
 
     # -------------------------------------------------------------
     # 5. Inventory setup
