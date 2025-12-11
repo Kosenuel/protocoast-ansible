@@ -21,6 +21,13 @@
         version: "{{ kubespray_branch | default(omit) }}"
         force: yes
 
+    - name: Initialize and update Kubespray submodules
+      ansible.builtin.command:
+        cmd: git submodule update --init --recursive
+      args:
+        chdir: "{{ kubespray_dir }}"
+
+
     - name: Ensure python3 venv support is installed (control host)
       ansible.builtin.package:
         name:
@@ -69,13 +76,13 @@
     - name: Run Kubespray cluster deploy
       ansible.builtin.command:
         argv:
-          - ../.venv/bin/ansible-playbook
+          - ./.venv/bin/ansible-playbook
           - -i
-          - ../../inventory/mycluster/hosts.yaml
+          - "{{ playbook_dir }}/../inventory/mycluster/hosts.yaml"
           - cluster.yml
           - -b
           - -v
-        chdir: "{{ playbook_dir }}/kubespray/playbooks"
+        chdir: "{{ playbook_dir }}/kubespray"
 
       environment:
         ANSIBLE_CONFIG: "{{ playbook_dir }}/../ansible.cfg"
