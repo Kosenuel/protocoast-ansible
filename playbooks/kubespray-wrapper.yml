@@ -5,7 +5,7 @@
   gather_facts: false
   vars:
     kubespray_repo: https://github.com/kubernetes-sigs/kubespray.git
-    kubespray_branch: "{{ kubespray_branch | default('release-1.27') }}"
+    kubespray_branch: "{{ kubespray_branch }}"
     kubespray_dir: ./kubespray
     inventory_file: inventory/mycluster/hosts.yaml
   tasks:
