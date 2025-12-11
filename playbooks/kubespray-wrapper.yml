@@ -39,6 +39,29 @@
         chdir: "{{ kubespray_dir }}"
 
     # -------------------------------------------------------------
+    # 2.5. Configure SSH for Agent Forwarding in Kubespray's ansible.cfg
+    # -------------------------------------------------------------
+    - name: Configure Kubespray ansible.cfg for SSH Agent Forwarding
+      ansible.builtin.lineinfile:
+        path: "{{ kubespray_dir }}/ansible.cfg"
+        regexp: '^#?ssh_args\s*=\s*'
+        line: 'ssh_args = -o ControlMaster=auto -o ControlPersist=60s -o StrictHostKeyChecking=no -o ForwardAgent=yes'
+        state: present
+        backup: yes
+      args:
+        chdir: "{{ kubespray_dir }}"
+
+    - name: Ensure private_key_file setting is commented out (relying on agent)
+      ansible.builtin.lineinfile:
+        path: "{{ kubespray_dir }}/ansible.cfg"
+        regexp: '^private_key_file\s*=\s*'
+        line: '#private_key_file = '
+        state: present
+        backup: yes
+      args:
+        chdir: "{{ kubespray_dir }}"
+
+    # -------------------------------------------------------------
     # 3. Clean and recreate venv
     # -------------------------------------------------------------
     - name: Remove existing venv (if corrupted from earlier runs)
@@ -109,9 +132,9 @@
       environment:
         ANSIBLE_CONFIG: "{{ kubespray_dir }}/ansible.cfg"
         # Force the SSH arguments to enable agent forwarding (-o ForwardAgent=yes)
-        ANSIBLE_SSH_ARGS: "-o ForwardAgent=yes" 
+        # ANSIBLE_SSH_ARGS: "-o ForwardAgent=yes" 
 
-        # Tell Ansible not to search for a default private key file (e.g., /root/.ssh/id_rsa), 
-        # which forces it to rely purely on the agent for authentication.
-        ANSIBLE_PRIVATE_KEY_FILE: "/home/ubuntu/.ssh/protocoast_terraform_key.pem"
+        # # Tell Ansible not to search for a default private key file (e.g., /root/.ssh/id_rsa), 
+        # # which forces it to rely purely on the agent for authentication.
+        # ANSIBLE_PRIVATE_KEY_FILE: "/home/ubuntu/.ssh/protocoast_terraform_key.pem"
        
