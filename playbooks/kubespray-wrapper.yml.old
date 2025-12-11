@@ -1,0 +1,110 @@
+﻿---
+- name: Kubespray wrapper - clone, install deps, run cluster deploy
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    kubespray_repo: https://github.com/kubernetes-sigs/kubespray.git
+    # Optionally pass kubespray_branch via --extra-vars to checkout a specific ref.
+    kubespray_dir: ./kubespray
+    inventory_file: ../inventory/mycluster/hosts.yaml
+  tasks:
+    - name: Ensure Git is installed (control host)
+      ansible.builtin.package:
+        name: git
+        state: present
+
+    - name: Clone Kubespray repository
+      ansible.builtin.git:
+        repo: "{{ kubespray_repo }}"
+        dest: "{{ kubespray_dir }}"
+        version: "{{ kubespray_branch | default(omit) }}"
+        force: yes
+
+    - name: Initialize and update submodules
+      ansible.builtin.command:
+        cmd: git submodule update --init --recursive
+      args:
+        chdir: "{{ kubespray_dir }}"
+
+    - name: Install Kubespray Ansible roles
+      ansible.builtin.command:
+        cmd: "{{ kubespray_dir }}/.venv/bin/ansible-galaxy install -r requirements.yml"
+      args:
+        chdir: "{{ kubespray_dir }}"
+
+    - name: Ensure python3 venv support is installed (control host)
+      ansible.builtin.package:
+        name:
+          - python3-venv
+          - python3-pip
+        state: present
+
+    - name: Create Kubespray inventory directory
+      ansible.builtin.file:
+        path: "{{ kubespray_dir }}/inventory/mycluster"
+        state: directory
+        recurse: yes
+        mode: '0755'
+
+    - name: Create Python virtualenv for Kubespray (control host)
+      ansible.builtin.command:
+        cmd: python3 -m venv "{{ kubespray_dir }}/.venv"
+      args:
+        creates: "{{ kubespray_dir }}/.venv/bin/activate" 
+
+    - name: Upgrade pip inside the Kubespray venv
+      ansible.builtin.command:
+        cmd: "{{ kubespray_dir }}/.venv/bin/pip install --upgrade pip setuptools wheel"
+
+    - name: Install Ansible inside venv
+      ansible.builtin.command:
+        cmd: "{{ kubespray_dir }}/.venv/bin/pip install ansible-core"
+
+    - name: Install Kubespray Python requirements
+      ansible.builtin.command:
+        cmd: "{{ kubespray_dir }}/.venv/bin/pip install -r requirements.txt"
+      args:
+        chdir: "{{ kubespray_dir }}"
+
+    - name: Install Kubespray Galaxy roles
+      ansible.builtin.command:
+        cmd: "{{ kubespray_dir }}/.venv/bin/ansible-galaxy install -r requirements.yml"
+      args:
+        chdir: "{{ kubespray_dir }}"
+
+    - name: Stat Kubespray requirements
+      ansible.builtin.stat:
+        path: "{{ kubespray_dir }}/requirements.txt"
+      register: kubespray_requirements_stat
+
+    - name: Ensure venv has pip (use ensurepip as needed)
+      ansible.builtin.command:
+        cmd: "{{ kubespray_dir }}/.venv/bin/python -m ensurepip --upgrade"
+      register: ensurepip_result
+      failed_when: ensurepip_result.rc not in [0]
+
+    - name: Install Python deps for Kubespray (control host) using venv python
+      ansible.builtin.command:
+        cmd: "{{ kubespray_dir }}/.venv/bin/python -m pip install -r {{ kubespray_dir }}/requirements.txt"
+      when: kubespray_requirements_stat.stat.exists
+
+    - name: Copy generated inventory to Kubespray inventory folder
+      ansible.builtin.copy:
+        src: "{{ inventory_file }}"
+        dest: "{{ kubespray_dir }}/inventory/mycluster/hosts.yaml"
+        force: yes
+
+    - name: Run Kubespray cluster deploy
+      ansible.builtin.command:
+        chdir: "{{ kubespray_dir }}"
+        argv:
+          - ./.venv/bin/ansible-playbook
+          - -i
+          - inventory/mycluster/hosts.yaml
+          - cluster.yml
+          - -b
+          - -v
+      environment:
+        ANSIBLE_CONFIG: "{{ kubespray_dir }}/ansible.cfg"
+
