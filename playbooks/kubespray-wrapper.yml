@@ -71,6 +71,7 @@
         # cmd: >
         #   "{{ kubespray_dir }}/.venv/bin/ansible-playbook -i {{ kubespray_dir }}/inventory/mycluster/hosts.yaml {{ kubespray_dir }}/cluster.yml -b -v"
     - name: Run Kubespray cluster deploy
+      ansible.builtin.command:
       command:
         - ./kubespray/.venv/bin/ansible-playbook
         - -i
