@@ -48,8 +48,8 @@
         line: 'ssh_args = -o ControlMaster=auto -o ControlPersist=60s -o StrictHostKeyChecking=no -o ForwardAgent=yes'
         state: present
         backup: yes
-      args:
-        chdir: "{{ kubespray_dir }}"
+      # args:
+      #   chdir: "{{ kubespray_dir }}"
 
     - name: Ensure private_key_file setting is commented out (relying on agent)
       ansible.builtin.lineinfile:
@@ -58,8 +58,8 @@
         line: '#private_key_file = '
         state: present
         backup: yes
-      args:
-        chdir: "{{ kubespray_dir }}"
+      # args:
+      #   chdir: "{{ kubespray_dir }}"
 
     # -------------------------------------------------------------
     # 3. Clean and recreate venv
