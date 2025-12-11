@@ -11,9 +11,9 @@
 
   tasks:
 
-    # ------------------------------
-    # 1. Ensure prerequisite system packages
-    # ------------------------------
+    # -------------------------------------------------------------
+    # 1. Ensure system dependencies
+    # -------------------------------------------------------------
     - name: Ensure required system packages are installed
       ansible.builtin.package:
         name:
@@ -22,9 +22,9 @@
           - python3-pip
         state: present
 
-    # ------------------------------
-    # 2. Clone Kubespray + Submodules
-    # ------------------------------
+    # -------------------------------------------------------------
+    # 2. Clone repo + submodules
+    # -------------------------------------------------------------
     - name: Clone Kubespray repository
       ansible.builtin.git:
         repo: "{{ kubespray_repo }}"
@@ -38,33 +38,36 @@
       args:
         chdir: "{{ kubespray_dir }}"
 
-    # ------------------------------
-    # 3. Python Virtualenv
-    # ------------------------------
+    # -------------------------------------------------------------
+    # 3. Clean and recreate venv
+    # -------------------------------------------------------------
+    - name: Remove existing venv (if corrupted from earlier runs)
+      ansible.builtin.file:
+        path: "{{ kubespray_dir }}/.venv"
+        state: absent
+
     - name: Create Python virtualenv
       ansible.builtin.command:
         cmd: python3 -m venv "{{ kubespray_dir }}/.venv"
-      args:
-        creates: "{{ kubespray_dir }}/.venv/bin/activate"
 
-    - name: Upgrade pip in the venv
-      ansible.builtin.command:
-        cmd: "{{ kubespray_dir }}/.venv/bin/pip install --upgrade pip setuptools wheel"
-
-    - name: Ensure venv has pip (ensurepip fallback)
+    - name: Ensure venv pip exists (ensurepip fallback)
       ansible.builtin.command:
         cmd: "{{ kubespray_dir }}/.venv/bin/python -m ensurepip --upgrade"
 
-    # ------------------------------
-    # 4. Install Ansible + Kubespray dependencies
-    # ------------------------------
+    - name: Upgrade pip inside venv
+      ansible.builtin.command:
+        cmd: "{{ kubespray_dir }}/.venv/bin/python -m pip install --upgrade pip setuptools wheel"
+
+    # -------------------------------------------------------------
+    # 4. Install Kubespray deps
+    # -------------------------------------------------------------
     - name: Install ansible-core inside venv
       ansible.builtin.command:
-        cmd: "{{ kubespray_dir }}/.venv/bin/pip install ansible-core"
+        cmd: "{{ kubespray_dir }}/.venv/bin/python -m pip install ansible-core"
 
     - name: Install Kubespray Python requirements
       ansible.builtin.command:
-        cmd: "{{ kubespray_dir }}/.venv/bin/pip install -r requirements.txt"
+        cmd: "{{ kubespray_dir }}/.venv/bin/python -m pip install -r requirements.txt"
       args:
         chdir: "{{ kubespray_dir }}"
 
@@ -74,9 +77,9 @@
       args:
         chdir: "{{ kubespray_dir }}"
 
-    # ------------------------------
-    # 5. Inventory Setup
-    # ------------------------------
+    # -------------------------------------------------------------
+    # 5. Inventory setup
+    # -------------------------------------------------------------
     - name: Ensure Kubespray inventory directory exists
       ansible.builtin.file:
         path: "{{ kubespray_dir }}/inventory/mycluster"
@@ -90,9 +93,9 @@
         dest: "{{ kubespray_dir }}/inventory/mycluster/hosts.yaml"
         force: yes
 
-    # ------------------------------
-    # 6. Run the Kubespray cluster deployment
-    # ------------------------------
+    # -------------------------------------------------------------
+    # 6. Deploy the cluster
+    # -------------------------------------------------------------
     - name: Run Kubespray cluster deploy
       ansible.builtin.command:
         chdir: "{{ kubespray_dir }}"
