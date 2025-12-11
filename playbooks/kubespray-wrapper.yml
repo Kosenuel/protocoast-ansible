@@ -71,7 +71,7 @@
         argv:
           - ./.venv/bin/ansible-playbook
           - -i
-          - inventory/mycluster/hosts.yaml
+          - "{{ playbook_dir }}/../inventory/mycluster/hosts.yaml"
           - cluster.yml
           - -b
           - -v
