@@ -21,7 +21,7 @@
         version: "{{ kubespray_branch | default(omit) }}"
         force: yes
 
-    - name: Initialize and update Kubespray submodules
+    - name: Initialize and update submodules
       ansible.builtin.command:
         cmd: git submodule update --init --recursive
       args:
@@ -51,16 +51,33 @@
       ansible.builtin.command:
         cmd: python3 -m venv "{{ kubespray_dir }}/.venv"
       args:
-        creates: "{{ kubespray_dir }}/.venv/bin/activate"
+        creates: "{{ kubespray_dir }}/.venv/bin/activate" 
 
     - name: Upgrade pip inside the Kubespray venv
       ansible.builtin.command:
-        cmd: "{{ kubespray_dir }}/.venv/bin/python -m pip install --upgrade pip setuptools wheel"
+        cmd: "{{ kubespray_dir }}/.venv/bin/pip install --upgrade pip setuptools wheel"
+
+    - name: Install Ansible inside venv
+      ansible.builtin.command:
+        cmd: "{{ kubespray_dir }}/.venv/bin/pip install ansible-core"
+
+    - name: Install Kubespray Python requirements
+      ansible.builtin.command:
+        cmd: "{{ kubespray_dir }}/.venv/bin/pip install -r requirements.txt"
+      args:
+        chdir: "{{ kubespray_dir }}"
+
+    - name: Install Kubespray Galaxy roles
+      ansible.builtin.command:
+        cmd: "{{ kubespray_dir }}/.venv/bin/ansible-galaxy install -r requirements.yml"
+      args:
+        chdir: "{{ kubespray_dir }}"
 
     - name: Stat Kubespray requirements
       ansible.builtin.stat:
         path: "{{ kubespray_dir }}/requirements.txt"
       register: kubespray_requirements_stat
+
     - name: Ensure venv has pip (use ensurepip as needed)
       ansible.builtin.command:
         cmd: "{{ kubespray_dir }}/.venv/bin/python -m ensurepip --upgrade"
