@@ -68,7 +68,7 @@
 
     - name: Run Kubespray cluster deploy
       ansible.builtin.command:
-        cmd:
+        argv:
           - ./kubespray/.venv/bin/ansible-playbook
           - -i
           - ./kubespray/inventory/mycluster/hosts.yaml
