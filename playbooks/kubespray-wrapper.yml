@@ -5,7 +5,8 @@
   gather_facts: false
   vars:
     kubespray_repo: https://github.com/kubernetes-sigs/kubespray.git
-    kubespray_branch: "{{ kubespray_branch }}"
+    # Default Kubespray branch. Override with --extra-vars "kubespray_branch=your_branch"
+    kubespray_branch: "main"
     kubespray_dir: ./kubespray
     inventory_file: inventory/mycluster/hosts.yaml
   tasks:
