@@ -76,9 +76,6 @@
           - -b
           - -v
         chdir: "{{ playbook_dir }}/kubespray"
-
-
+        
       environment:
         ANSIBLE_CONFIG: "{{ playbook_dir }}/../ansible.cfg"
-      args:
-        chdir: "{{ kubespray_dir }}"
