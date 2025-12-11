@@ -49,11 +49,15 @@
       ansible.builtin.stat:
         path: "{{ kubespray_dir }}/requirements.txt"
       register: kubespray_requirements_stat
+    - name: Ensure venv has pip (use ensurepip as needed)
+      ansible.builtin.command:
+        cmd: "{{ kubespray_dir }}/.venv/bin/python -m ensurepip --upgrade"
+      register: ensurepip_result
+      failed_when: ensurepip_result.rc not in [0]
 
-    - name: Install Python deps for Kubespray (control host)
-      ansible.builtin.pip:
-        requirements: "{{ kubespray_dir }}/requirements.txt"
-        executable: "{{ kubespray_dir }}/.venv/bin/pip"
+    - name: Install Python deps for Kubespray (control host) using venv python
+      ansible.builtin.command:
+        cmd: "{{ kubespray_dir }}/.venv/bin/python -m pip install -r {{ kubespray_dir }}/requirements.txt"
       when: kubespray_requirements_stat.stat.exists
 
     - name: Copy generated inventory to Kubespray inventory folder
