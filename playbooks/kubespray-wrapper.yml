@@ -71,11 +71,11 @@
         argv:
           - ../kubespray/.venv/bin/ansible-playbook
           - -i
-          - inventory/mycluster/hosts.yaml
-          - cluster.yml
+          - ../kubespray/inventory/mycluster/hosts.yaml
+          - ../kubespray/cluster.yml
           - -b
           - -v
-        chdir: "{{ playbook_dir }}/.."
+        chdir: "{{ playbook_dir }}/kubespray"
 
 
       environment:
