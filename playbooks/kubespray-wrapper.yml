@@ -19,7 +19,7 @@
       ansible.builtin.git:
         repo: "{{ kubespray_repo }}"
         dest: "{{ kubespray_dir }}"
-        version: "{{ kubespray_branch | default('release-2.26') }}"
+        version: "{{ kubespray_branch | default(omit) }}"
         force: yes
 
     - name: Install Python deps for Kubespray (control host)
