@@ -7,7 +7,7 @@
     kubespray_repo: https://github.com/kubernetes-sigs/kubespray.git
     # Optionally pass kubespray_branch via --extra-vars to checkout a specific ref.
     kubespray_dir: ./kubespray
-    inventory_file: inventory/mycluster/hosts.yaml
+    inventory_file: ../inventory/mycluster/hosts.yaml
   tasks:
     - name: Ensure Git is installed (control host)
       ansible.builtin.package:
