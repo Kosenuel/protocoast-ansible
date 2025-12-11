@@ -108,3 +108,10 @@
           - -v
       environment:
         ANSIBLE_CONFIG: "{{ kubespray_dir }}/ansible.cfg"
+        # Force the SSH arguments to enable agent forwarding (-o ForwardAgent=yes)
+        ANSIBLE_SSH_ARGS: "-o ForwardAgent=yes" 
+
+        # Tell Ansible not to search for a default private key file (e.g., /root/.ssh/id_rsa), 
+        # which forces it to rely purely on the agent for authentication.
+        ANSIBLE_PRIVATE_KEY_FILE: "none"
+        # === ADDED LINES END ===
