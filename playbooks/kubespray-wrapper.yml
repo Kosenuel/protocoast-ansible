@@ -66,19 +66,16 @@
         dest: "{{ kubespray_dir }}/inventory/mycluster/hosts.yaml"
         force: yes
 
-    # - name: Run Kubespray cluster deploy
-    #   ansible.builtin.command:
-        # cmd: >
-        #   "{{ kubespray_dir }}/.venv/bin/ansible-playbook -i {{ kubespray_dir }}/inventory/mycluster/hosts.yaml {{ kubespray_dir }}/cluster.yml -b -v"
     - name: Run Kubespray cluster deploy
       ansible.builtin.command:
-      command:
-        - ./kubespray/.venv/bin/ansible-playbook
-        - -i
-        - ./kubespray/inventory/mycluster/hosts.yaml
-        - ./kubespray/cluster.yml
-        - -b
-        - -v
+        cmd:
+          - ./kubespray/.venv/bin/ansible-playbook
+          - -i
+          - ./kubespray/inventory/mycluster/hosts.yaml
+          - ./kubespray/cluster.yml
+          - -b
+          - -v
+
 
       environment:
         ANSIBLE_CONFIG: "{{ playbook_dir }}/../ansible.cfg"
