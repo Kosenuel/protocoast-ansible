@@ -27,6 +27,11 @@
       args:
         chdir: "{{ kubespray_dir }}"
 
+    - name: Install Kubespray Ansible roles
+      ansible.builtin.command:
+        cmd: "{{ kubespray_dir }}/.venv/bin/ansible-galaxy install -r requirements.yml"
+      args:
+        chdir: "{{ kubespray_dir }}"
 
     - name: Ensure python3 venv support is installed (control host)
       ansible.builtin.package:
@@ -75,14 +80,14 @@
 
     - name: Run Kubespray cluster deploy
       ansible.builtin.command:
-        chdir: "{{ playbook_dir }}/kubespray"
+        chdir: "{{ kubespray_dir }}"
         argv:
           - ./.venv/bin/ansible-playbook
           - -i
-          - "../../inventory/mycluster/hosts.yaml"
+          - inventory/mycluster/hosts.yaml
           - cluster.yml
           - -b
           - -v
-
       environment:
-        ANSIBLE_CONFIG: "{{ playbook_dir }}/../ansible.cfg"
+        ANSIBLE_CONFIG: "{{ kubespray_dir }}/ansible.cfg"
+
