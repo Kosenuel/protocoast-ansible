@@ -113,5 +113,5 @@
 
         # Tell Ansible not to search for a default private key file (e.g., /root/.ssh/id_rsa), 
         # which forces it to rely purely on the agent for authentication.
-        ANSIBLE_PRIVATE_KEY_FILE: "none"
-        # === ADDED LINES END ===
+        ANSIBLE_PRIVATE_KEY_FILE: "/home/ubuntu/.ssh/protocoast_terraform_key.pem"
+       
