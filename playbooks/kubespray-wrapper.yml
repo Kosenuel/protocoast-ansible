@@ -73,9 +73,9 @@
 
     - name: Install Kubespray Galaxy roles
       ansible.builtin.command:
-        cmd: "{{ kubespray_dir }}/.venv/bin/ansible-galaxy install -r requirements.yml"
-      args:
-        chdir: "{{ kubespray_dir }}"
+        cmd: "{{ kubespray_dir }}/.venv/bin/ansible-galaxy install -r {{ kubespray_dir }}/requirements.yml"
+      # args:
+      #   chdir: "{{ kubespray_dir }}"
 
     # -------------------------------------------------------------
     # 5. Inventory setup
