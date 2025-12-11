@@ -69,7 +69,7 @@
     - name: Run Kubespray cluster deploy
       ansible.builtin.command:
         argv:
-          - ./kubespray/.venv/bin/ansible-playbook
+          - .{{ kubespray_dir }}/.venv/bin/ansible-playbook
           - -i
           - ./kubespray/inventory/mycluster/hosts.yaml
           - ./kubespray/cluster.yml
