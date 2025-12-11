@@ -5,31 +5,19 @@ all:
   hosts:
     # Control plane hosts (defaults inferred from modules' defaults).
     k8s-cp-1:
-      ansible_host: 10.0.1.143    # <-- REPLACE with actual private IP
-      ip: 10.0.1.143             # kubeadm/ip used by Kubespray
-      access_ip:     # <-- REPLACE with public/floating IP if available, else omit
+      ansible_host: 10.0.1.143    # actual private IP of the host
     k8s-cp-2:
       ansible_host: 10.0.1.58
-      ip: 10.0.1.58
-      access_ip: 
     k8s-cp-3:
       ansible_host: 10.0.1.185
-      ip: 10.0.1.185
-      access_ip: 
 
     # Worker hosts
     k8s-worker-1:
       ansible_host: 10.0.1.44
-      ip: 10.0.1.44
-      access_ip: 
     k8s-worker-2:
       ansible_host: 10.0.1.169
-      ip: 10.0.1.169 
-      access_ip: 
     k8s-worker-3:
       ansible_host: 10.0.1.19
-      ip: 10.0.1.19
-      access_ip: 
 
   children:
     kube_control_plane:
