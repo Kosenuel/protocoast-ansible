@@ -5,8 +5,8 @@
   gather_facts: false
   vars:
     kubespray_repo: https://github.com/kubernetes-sigs/kubespray.git
-    # Default Kubespray branch. Override with --extra-vars "kubespray_branch=your_branch"
-    kubespray_branch: "main"
+    # Optionally override the branch with --extra-vars "kubespray_branch=your_branch".
+    # If not provided, the git module will use the repository default HEAD.
     kubespray_dir: ./kubespray
     inventory_file: inventory/mycluster/hosts.yaml
   tasks:
@@ -19,7 +19,7 @@
       ansible.builtin.git:
         repo: "{{ kubespray_repo }}"
         dest: "{{ kubespray_dir }}"
-        version: "{{ kubespray_branch }}"
+        version: "{{ kubespray_branch | default('release-2.26') }}"
         force: yes
 
     - name: Install Python deps for Kubespray (control host)
