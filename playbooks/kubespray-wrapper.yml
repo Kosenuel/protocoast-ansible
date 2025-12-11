@@ -67,7 +67,7 @@
 
     - name: Install Kubespray Python requirements
       ansible.builtin.command:
-        cmd: "{{ kubespray_dir }}/.venv/bin/python -m pip install -r requirements.txt"
+        cmd: "{{ kubespray_dir }}/.venv/bin/python3 -m pip install -r requirements.txt"
       args:
         chdir: "{{ kubespray_dir }}"
 
