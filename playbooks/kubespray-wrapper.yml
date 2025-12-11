@@ -1,12 +1,11 @@
----
+﻿---
 - name: Kubespray wrapper - clone, install deps, run cluster deploy
   hosts: localhost
   connection: local
   gather_facts: false
   vars:
     kubespray_repo: https://github.com/kubernetes-sigs/kubespray.git
-    # Optionally override the branch with --extra-vars "kubespray_branch=your_branch".
-    # If not provided, the git module will use the repository default HEAD.
+    # Optionally pass kubespray_branch via --extra-vars to checkout a specific ref.
     kubespray_dir: ./kubespray
     inventory_file: inventory/mycluster/hosts.yaml
   tasks:
@@ -22,10 +21,40 @@
         version: "{{ kubespray_branch | default(omit) }}"
         force: yes
 
+    - name: Ensure python3 venv support is installed (control host)
+      ansible.builtin.package:
+        name:
+          - python3-venv
+          - python3-pip
+        state: present
+
+    - name: Create Kubespray inventory directory
+      ansible.builtin.file:
+        path: "{{ kubespray_dir }}/inventory/mycluster"
+        state: directory
+        recurse: yes
+        mode: '0755'
+
+    - name: Create Python virtualenv for Kubespray (control host)
+      ansible.builtin.command:
+        cmd: python3 -m venv "{{ kubespray_dir }}/.venv"
+      args:
+        creates: "{{ kubespray_dir }}/.venv/bin/activate"
+
+    - name: Upgrade pip inside the Kubespray venv
+      ansible.builtin.command:
+        cmd: "{{ kubespray_dir }}/.venv/bin/python -m pip install --upgrade pip setuptools wheel"
+
+    - name: Stat Kubespray requirements
+      ansible.builtin.stat:
+        path: "{{ kubespray_dir }}/requirements.txt"
+      register: kubespray_requirements_stat
+
     - name: Install Python deps for Kubespray (control host)
       ansible.builtin.pip:
         requirements: "{{ kubespray_dir }}/requirements.txt"
-        executable: pip3
+        executable: "{{ kubespray_dir }}/.venv/bin/pip"
+      when: kubespray_requirements_stat.stat.exists
 
     - name: Copy generated inventory to Kubespray inventory folder
       ansible.builtin.copy:
@@ -34,8 +63,9 @@
         force: yes
 
     - name: Run Kubespray cluster deploy
-      ansible.builtin.command: >
-        ansible-playbook -i {{ kubespray_dir }}/inventory/mycluster/hosts.yaml {{ kubespray_dir }}/cluster.yml -b -v
+      ansible.builtin.command:
+        cmd: >
+          "{{ kubespray_dir }}/.venv/bin/ansible-playbook -i {{ kubespray_dir }}/inventory/mycluster/hosts.yaml {{ kubespray_dir }}/cluster.yml -b -v"
       environment:
         ANSIBLE_CONFIG: "{{ playbook_dir }}/../ansible.cfg"
       args:
