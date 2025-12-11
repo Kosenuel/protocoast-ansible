@@ -75,7 +75,7 @@
           - cluster.yml
           - -b
           - -v
-        chdir: "{{ kubespray_dir }}"
+        chdir: "{{ playbook_dir }}/.."
 
 
       environment:
