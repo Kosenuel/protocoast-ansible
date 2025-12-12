@@ -5,19 +5,19 @@ all:
   hosts:
     # Control plane hosts (defaults inferred from modules' defaults).
     k8s-cp-1:
-      ansible_host: 10.0.1.143    # actual private IP of the host
+      ansible_host: 10.0.1.10    # actual private IP of the host
     k8s-cp-2:
-      ansible_host: 10.0.1.58
+      ansible_host: 10.0.1.70
     k8s-cp-3:
-      ansible_host: 10.0.1.185
+      ansible_host: 10.0.1.143
 
     # Worker hosts
     k8s-worker-1:
-      ansible_host: 10.0.1.44
+      ansible_host: 10.0.1.204
     k8s-worker-2:
-      ansible_host: 10.0.1.169
+      ansible_host:  10.0.1.174
     k8s-worker-3:
-      ansible_host: 10.0.1.19
+      ansible_host: 10.0.1.169
 
   children:
     kube_control_plane:
@@ -42,4 +42,7 @@ all:
       children:
         kube_control_plane: {}
         kube_node: {}
+
+    calico_rr:
+      hosts: {}
 
